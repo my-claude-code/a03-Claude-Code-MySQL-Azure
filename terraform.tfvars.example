@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and fill in the two values below.
+# terraform.tfvars is gitignored — it will never be committed.
+# Everything else has defaults already set in variables.tf.
+
+subscription_id     = "your-azure-subscription-id"
+entra_client_secret = "your-entra-client-secret"
