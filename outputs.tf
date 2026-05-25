@@ -18,6 +18,11 @@ output "entra_redirect_uri" {
   value       = "https://${azurerm_public_ip.app.ip_address}/auth/callback"
 }
 
+output "ACTION_REQUIRED" {
+  description = "What to do after deployment"
+  value       = "Go to Azure AD > App registrations > your app > Authentication > Redirect URIs and add: https://${azurerm_public_ip.app.ip_address}/auth/callback"
+}
+
 output "ssh_mysql" {
   description = "SSH command for MySQL VM"
   value       = "ssh ivansto@${azurerm_public_ip.mysql.ip_address}"
