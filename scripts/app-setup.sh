@@ -31,10 +31,9 @@ FLASK_SECRET_KEY=${flask_secret_key}
 DATABASE_URL=mysql+pymysql://${db_user}:${db_password}@${mysql_private_ip}:3306/${db_name}
 ENV_EOF
 
-echo "==> Waiting for MySQL on ${mysql_private_ip} (up to 10 minutes)..."
-READY=0
-for i in $(seq 1 60); do
-    if python3 -c "
+echo "==> Waiting for MySQL on ${mysql_private_ip}..."
+i=0
+until python3 -c "
 import pymysql, sys
 try:
     c = pymysql.connect(host='${mysql_private_ip}', user='${db_user}', password='${db_password}', database='${db_name}')
@@ -42,19 +41,12 @@ try:
     sys.exit(0)
 except:
     sys.exit(1)
-" 2>/dev/null; then
-        echo "MySQL is ready after $i attempt(s)."
-        READY=1
-        break
-    fi
-    echo "Attempt $i/60 — MySQL not ready yet, retrying in 10s..."
+" 2>/dev/null; do
+    i=$((i+1))
+    echo "Attempt $i — MySQL not ready yet, retrying in 10s..."
     sleep 10
 done
-
-if [ "$READY" -eq 0 ]; then
-    echo "ERROR: MySQL did not become available in time." >&2
-    exit 1
-fi
+echo "MySQL is ready after $i attempt(s)."
 
 echo "==> Initialising database schema..."
 FLASK_APP=app.py venv/bin/flask init-db
