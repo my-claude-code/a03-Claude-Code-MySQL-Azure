@@ -7,7 +7,7 @@ while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 2; done
 
 echo "==> Installing dependencies..."
 DEBIAN_FRONTEND=noninteractive apt-get update -y
-DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pip python3-venv git nginx
+DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pip python3-venv git nginx openssl
 
 echo "==> Cloning app from GitHub..."
 cd /opt
@@ -26,7 +26,7 @@ cat > .env <<'ENV_EOF'
 ENTRA_CLIENT_ID=${entra_client_id}
 ENTRA_CLIENT_SECRET=${entra_client_secret}
 ENTRA_TENANT_ID=${entra_tenant_id}
-REDIRECT_URI=http://${app_public_ip}/auth/callback
+REDIRECT_URI=https://${app_public_ip}/auth/callback
 FLASK_SECRET_KEY=${flask_secret_key}
 DATABASE_URL=mysql+pymysql://${db_user}:${db_password}@${mysql_private_ip}:3306/${db_name}
 ENV_EOF
@@ -68,11 +68,20 @@ systemctl daemon-reload
 systemctl enable flask-app
 systemctl start flask-app
 
-echo "==> Configuring nginx reverse proxy on port 80..."
+echo "==> Generating self-signed SSL certificate..."
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout /etc/ssl/private/flask-app.key \
+  -out /etc/ssl/certs/flask-app.crt \
+  -subj "/CN=${app_public_ip}"
+
+echo "==> Configuring nginx with HTTPS..."
 cat > /etc/nginx/sites-available/flask-app <<'NGINX_EOF'
 server {
-    listen 80;
+    listen 443 ssl;
     server_name _;
+
+    ssl_certificate     /etc/ssl/certs/flask-app.crt;
+    ssl_certificate_key /etc/ssl/private/flask-app.key;
 
     location / {
         proxy_pass         http://127.0.0.1:5000;
@@ -82,6 +91,12 @@ server {
         proxy_read_timeout 60s;
     }
 }
+
+server {
+    listen 80;
+    server_name _;
+    return 301 https://$host$request_uri;
+}
 NGINX_EOF
 
 ln -sf /etc/nginx/sites-available/flask-app /etc/nginx/sites-enabled/flask-app
@@ -89,4 +104,4 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl restart nginx
 
-echo "==> App setup complete. Visit http://${app_public_ip}"
+echo "==> App setup complete. Visit https://${app_public_ip}"
