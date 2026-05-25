@@ -73,6 +73,7 @@ resource "azurerm_public_ip" "app" {
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
+  domain_name_label   = var.dns_label
 }
 
 # ── Network Interfaces ───────────────────────────────────────────────────────
@@ -162,6 +163,7 @@ resource "azurerm_linux_virtual_machine" "app" {
     entra_tenant_id     = var.entra_tenant_id
     flask_secret_key    = var.flask_secret_key
     app_public_ip       = azurerm_public_ip.app.ip_address
+    app_fqdn            = azurerm_public_ip.app.fqdn
     mysql_private_ip    = local.mysql_private_ip
     db_name             = "flask_notes"
     db_user             = "flask_user"

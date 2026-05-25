@@ -9,13 +9,13 @@ output "app_public_ip" {
 }
 
 output "app_url" {
-  description = "Flask app URL"
-  value       = "http://${azurerm_public_ip.app.ip_address}"
+  description = "Flask app URL (permanent hostname)"
+  value       = "http://${azurerm_public_ip.app.fqdn}"
 }
 
 output "entra_redirect_uri" {
-  description = "Add this URI to your Azure AD app registration under Authentication > Redirect URIs"
-  value       = "http://${azurerm_public_ip.app.ip_address}/auth/callback"
+  description = "Add this URI ONCE to your Azure AD app registration — stays the same across redeployments"
+  value       = "http://${azurerm_public_ip.app.fqdn}/auth/callback"
 }
 
 output "ssh_mysql" {

@@ -26,7 +26,7 @@ cat > .env <<'ENV_EOF'
 ENTRA_CLIENT_ID=${entra_client_id}
 ENTRA_CLIENT_SECRET=${entra_client_secret}
 ENTRA_TENANT_ID=${entra_tenant_id}
-REDIRECT_URI=http://${app_public_ip}/auth/callback
+REDIRECT_URI=http://${app_fqdn}/auth/callback
 FLASK_SECRET_KEY=${flask_secret_key}
 DATABASE_URL=mysql+pymysql://${db_user}:${db_password}@${mysql_private_ip}:3306/${db_name}
 ENV_EOF
