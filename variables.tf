@@ -56,9 +56,3 @@ variable "db_password" {
   type        = string
   default     = "secretpass1"
 }
-
-variable "dns_label" {
-  description = "DNS label for the app VM public IP — must be unique within the Azure region. Gives: <label>.westeurope.cloudapp.azure.com"
-  type        = string
-  default     = "flask-notes-ivansto"
-}
