@@ -34,13 +34,8 @@ ENV_EOF
 echo "==> Waiting for MySQL on ${mysql_private_ip}..."
 i=0
 until python3 -c "
-import pymysql, sys
-try:
-    c = pymysql.connect(host='${mysql_private_ip}', user='${db_user}', password='${db_password}', database='${db_name}')
-    c.close()
-    sys.exit(0)
-except:
-    sys.exit(1)
+import pymysql
+pymysql.connect(host='${mysql_private_ip}', user='${db_user}', password='${db_password}', database='${db_name}').close()
 " 2>/dev/null; do
     i=$((i+1))
     echo "Attempt $i — MySQL not ready yet, retrying in 10s..."
