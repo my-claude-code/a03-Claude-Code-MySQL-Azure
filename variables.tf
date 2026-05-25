@@ -40,9 +40,8 @@ variable "entra_client_id" {
 }
 
 variable "entra_tenant_id" {
-  description = "Microsoft Entra tenant ID"
+  description = "Microsoft Entra tenant ID — provide in terraform.tfvars (gitignored)"
   type        = string
-  default     = "097f33a9-6fc9-423f-923e-f9e3a3122986"
 }
 
 variable "flask_secret_key" {
