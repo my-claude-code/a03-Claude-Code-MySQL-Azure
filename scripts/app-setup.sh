@@ -31,9 +31,9 @@ FLASK_SECRET_KEY=${flask_secret_key}
 DATABASE_URL=mysql+pymysql://${db_user}:${db_password}@${mysql_private_ip}:3306/${db_name}
 ENV_EOF
 
-echo "==> Waiting for MySQL on ${mysql_private_ip} (up to 5 minutes)..."
+echo "==> Waiting for MySQL on ${mysql_private_ip} (up to 10 minutes)..."
 READY=0
-for i in $(seq 1 30); do
+for i in $(seq 1 60); do
     if python3 -c "
 import pymysql, sys
 try:
@@ -47,7 +47,7 @@ except:
         READY=1
         break
     fi
-    echo "Attempt $i/30 — MySQL not ready yet, retrying in 10s..."
+    echo "Attempt $i/60 — MySQL not ready yet, retrying in 10s..."
     sleep 10
 done
 
